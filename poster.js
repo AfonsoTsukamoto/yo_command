@@ -17,7 +17,7 @@ function randomInterval() {
 // Waiting from my api token ...
 var url = 'http://yo.moinnadeem.com/'
 var socket = require('socket.io-client')(url);
-
+var output_control = false;
 socket.on('connect', function() {
     console.log('ON!');
 
@@ -25,12 +25,10 @@ socket.on('connect', function() {
         console.log('GONE!');
         process.exit(1);
     });
-    // Just a timeout for... well, stuff!
-    setTimeout(function() {
-        socket.send(spammed);
-        console.log(spammed + ', YO!');
-        process.exit(1);
-    }, 1000);
+
+    socket.send(spammed);
+    console.log(spammed + ', YO!');
+    output_control = true;
 });
 
 var counter = 0;
@@ -59,16 +57,26 @@ setInterval(function() {
             text = '';
             break;
     }
-    console.log(text);
+    if (output_control) {
+        console.log('Giving it a sec just to be sure...');
+        clearInterval(this);
+    } else {
+        console.log(text);
+    }
     counter++;
 }, 1000);
 
 setTimeout(function() {
-    console.log('Dead....');
-    console.log('Looks like ' + url + ' is not responding.');
-    console.log('Sorry!');
+    socket.disconnect();
+    if (!output_control) {
+        console.log('Dead....');
+        console.log('Looks like ' + url + ' is not responding.');
+        console.log('Sorry!');
+    } else {
+        console.log('DONE!');
+    }
     process.exit(1);
-}, 7000)
+}, 6000)
 
 //var readline = require('readline');
 //var rl = readline.createInterface({
